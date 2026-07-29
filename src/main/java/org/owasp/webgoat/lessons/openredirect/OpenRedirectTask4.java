@@ -37,6 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class OpenRedirectTask4 implements AssignmentEndpoint {
 
   private static final Set<String> INTERNAL_HOSTS = Set.of("webgoat.local", "localhost", "127.0.0.1");
+  private static final Set<String> ALLOWED_SCHEMES = Set.of("http", "https");
 
   @PostMapping("/OpenRedirect/task4")
   @ResponseBody
@@ -56,6 +57,13 @@ public class OpenRedirectTask4 implements AssignmentEndpoint {
       firstUri = new URI(firstDecoded);
     } catch (URISyntaxException e) {
       return failed(this).feedback("openredirect.failure4").output("Invalid URL after first decode").build();
+    }
+
+    if (!isAllowedInternalUri(firstUri)) {
+      return failed(this)
+          .feedback("openredirect.failure4")
+          .output("Target URL is not allowed")
+          .build();
     }
 
     String firstHost = firstUri.getHost();
@@ -94,6 +102,30 @@ public class OpenRedirectTask4 implements AssignmentEndpoint {
         .feedback("openredirect.failure4")
         .output(debug.append("Bypass not achieved. Use %25 encoding to hide '@' or other host change.").toString())
         .build();
+  }
+
+  private boolean isAllowedInternalUri(URI uri) {
+    if (uri == null) {
+      return false;
+    }
+
+    String scheme = uri.getScheme();
+    String host = uri.getHost();
+    String userInfo = uri.getUserInfo();
+
+    if (scheme == null || host == null) {
+      return false;
+    }
+
+    if (!ALLOWED_SCHEMES.contains(scheme.toLowerCase())) {
+      return false;
+    }
+
+    if (userInfo != null && !userInfo.isBlank()) {
+      return false;
+    }
+
+    return INTERNAL_HOSTS.contains(host.toLowerCase());
   }
 
   private String esc(String s) {
