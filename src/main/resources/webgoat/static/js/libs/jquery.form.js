@@ -189,8 +189,26 @@ $.fn.ajaxSubmit = function(options) {
     if (!options.dataType && options.target) {
         var oldSuccess = options.success || function(){};
         callbacks.push(function(data) {
-            var fn = options.replaceTarget ? 'replaceWith' : 'html';
-            $(options.target)[fn](data).each(oldSuccess, arguments);
+            var fn = options.replaceTarget ? 'replaceWith' : 'text';
+            var $target = $(options.target);
+            if (!$target.length) {
+                oldSuccess.apply(this, arguments);
+                return;
+            }
+
+            // Always render untrusted response as text to prevent DOM-based XSS.
+            // Keep replaceTarget behavior by replacing each matched node with a text node.
+            if (fn === 'replaceWith') {
+                $target.each(function() {
+                    var textNode = document.createTextNode(data == null ? '' : String(data));
+                    $(this).replaceWith(textNode);
+                });
+            }
+            else {
+                $target.text(data == null ? '' : String(data));
+            }
+
+            oldSuccess.apply(this, arguments);
         });
     }
     else if (options.success) {
