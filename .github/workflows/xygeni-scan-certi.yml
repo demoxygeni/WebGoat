@@ -24,6 +24,6 @@ jobs:
         uses: xygeni/xygeni-action@13c6ed2797df7d85749864e2cbcf09c893f43b23
         id: Xygeni-Scanner
         with:
-          xygeni_url: https://apidemo.xygeni.io
+          xygeni_url: https://apicerti.xygeni.io
           token: ${{ secrets.XYGENI_TOKEN }}
           gh_token: ${{ secrets.PAT_FOR_XYGENI_SCAN }}
