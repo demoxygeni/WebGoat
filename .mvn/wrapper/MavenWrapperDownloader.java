@@ -75,7 +75,20 @@ public class MavenWrapperDownloader {
         }
         System.out.println("- Downloading from: " + url);
 
-        File outputFile = new File(baseDirectory.getAbsolutePath(), MAVEN_WRAPPER_JAR_PATH);
+        File outputFile;
+        try {
+            File canonicalBaseDirectory = baseDirectory.getCanonicalFile();
+            outputFile = new File(canonicalBaseDirectory, MAVEN_WRAPPER_JAR_PATH).getCanonicalFile();
+            if(!outputFile.getPath().startsWith(canonicalBaseDirectory.getPath() + File.separator)) {
+                System.out.println("- ERROR output file is outside the base directory");
+                System.exit(1);
+                return;
+            }
+        } catch (IOException e) {
+            System.out.println("- ERROR resolving output file path");
+            System.exit(1);
+            return;
+        }
         if(!outputFile.getParentFile().exists()) {
             if(!outputFile.getParentFile().mkdirs()) {
                 System.out.println(
