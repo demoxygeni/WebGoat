@@ -47,7 +47,14 @@ public class MavenWrapperDownloader {
 
     public static void main(String args[]) {
         System.out.println("- Downloader started");
-        File baseDirectory = new File(args[0]);
+        File baseDirectory;
+        try {
+            baseDirectory = new File(args[0]).getCanonicalFile();
+        } catch (IOException e) {
+            System.out.println("- ERROR resolving base directory");
+            System.exit(1);
+            return;
+        }
         System.out.println("- Using base directory: " + baseDirectory.getAbsolutePath());
 
         // If the maven-wrapper.properties exists, read it and check if it contains a custom
@@ -75,7 +82,23 @@ public class MavenWrapperDownloader {
         }
         System.out.println("- Downloading from: " + url);
 
-        File outputFile = new File(baseDirectory.getAbsolutePath(), MAVEN_WRAPPER_JAR_PATH);
+        File outputFile;
+        try {
+            outputFile = new File(baseDirectory, MAVEN_WRAPPER_JAR_PATH).getCanonicalFile();
+            String baseDirectoryPath = baseDirectory.getCanonicalPath();
+            if (!baseDirectoryPath.endsWith(File.separator)) {
+                baseDirectoryPath += File.separator;
+            }
+            if (!outputFile.getCanonicalPath().startsWith(baseDirectoryPath)) {
+                System.out.println("- ERROR output file must be within the base directory");
+                System.exit(1);
+                return;
+            }
+        } catch (IOException e) {
+            System.out.println("- ERROR resolving output file");
+            System.exit(1);
+            return;
+        }
         if(!outputFile.getParentFile().exists()) {
             if(!outputFile.getParentFile().mkdirs()) {
                 System.out.println(
