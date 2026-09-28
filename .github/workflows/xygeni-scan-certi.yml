@@ -5,6 +5,10 @@ on:
   # no pull request triggers
   # no schedule triggers
 
+# The scan only reads the repository.
+permissions:
+  contents: read
+
 jobs:
   xygeni-scan:
     name: Xygeni Scan
@@ -21,9 +25,9 @@ jobs:
           fetch-depth: 0  # Shallow clones should be disabled for better relevancy of analysis
 
       - name: Xygeni-Scanner
-        uses: xygeni/xygeni-action@13c6ed2797df7d85749864e2cbcf09c893f43b23
+        uses: xygeni/xygeni-action@4c800b1936f3edef2021f82a2e1dfb740e48d832
         id: Xygeni-Scanner
         with:
           xygeni_url: https://apicerti.xygeni.io
           token: ${{ secrets.XYGENI_TOKEN }}
-          gh_token: ${{ secrets.PAT_FOR_XYGENI_SCAN }}
+          gh_token: ${{ secrets.GITHUB_TOKEN }}
