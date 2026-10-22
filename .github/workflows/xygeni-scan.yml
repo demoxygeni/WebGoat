@@ -2,9 +2,10 @@ name: Xygeni Scan
 on:
   workflow_dispatch:  # Allows manual triggering
   # no push triggers
-  # no pull request triggers
-  schedule:
-    - cron: '00 03 * * *'
+  pull_request:
+    branches:
+      - main
+  # no schedule triggers
 
 # The scan only reads the repository.
 permissions:
